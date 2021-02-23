@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "0.0.1",
-  "description": "dashboard",
+  "description": "Backend with JWT Auth",
   "keywords": [
     "loopback-application",
     "loopback"
@@ -12,8 +12,9 @@
     "node": ">=10.16"
   },
   "scripts": {
-    "dev": "tsc-watch --target es2017 --outDir ./dist --onSuccess \"node .\"",
+    "dev": "PORT=5000 tsc-watch --target es2017 --outDir ./dist --onSuccess \"node .\"",
     "start": "pm2 start ecosystem.config.js --env production",
+    "restart": "lb-tsc && pm2 restart ecosystem.config.js --env production",
     "stop": "pm2 stop ecosystem.config.js --env production",
     "build": "lb-tsc",
     "build:watch": "lb-tsc --watch",

@@ -1,12 +1,9 @@
 import { Entity, model, property } from '@loopback/repository'
 
 @model({
-  settings: {
-    idInjection: false,
-    mysql: { schema: 'dashboard', table: 'users' },
-  },
+  settings: { idInjection: false, mysql: { schema: 'dialer', table: 'user' } },
 })
-export class Users extends Entity {
+export class User extends Entity {
   @property({
     type: 'number',
     generated: true,
@@ -23,50 +20,48 @@ export class Users extends Entity {
     },
   })
   id: number
-
   @property({
     type: 'string',
-    required: true,
-    length: 45,
+    length: 512,
     mysql: {
       columnName: 'email',
       dataType: 'varchar',
-      dataLength: 45,
+      dataLength: 512,
       dataPrecision: null,
       dataScale: null,
-      nullable: 'N',
+      nullable: 'Y',
     },
   })
-  email: string
+  email?: string
 
   @property({
     type: 'string',
-    required: true,
-    length: 60,
-    mysql: {
-      columnName: 'password',
-      dataType: 'varchar',
-      dataLength: 60,
-      dataPrecision: null,
-      dataScale: null,
-      nullable: 'N',
-    },
-  })
-  password: string
-
-  @property({
-    type: 'string',
-    length: 45,
+    length: 512,
     mysql: {
       columnName: 'name',
       dataType: 'varchar',
-      dataLength: 45,
+      dataLength: 512,
       dataPrecision: null,
       dataScale: null,
       nullable: 'Y',
     },
   })
   name?: string
+
+  @property({
+    type: 'string',
+    required: true,
+    length: 512,
+    mysql: {
+      columnName: 'password',
+      dataType: 'varchar',
+      dataLength: 512,
+      dataPrecision: null,
+      dataScale: null,
+      nullable: 'N',
+    },
+  })
+  password: string
 
   @property({
     type: 'string',
@@ -80,7 +75,22 @@ export class Users extends Entity {
       nullable: 'Y',
     },
   })
-  role?: string;
+  role?: string
+
+  @property({
+    type: 'string',
+    required: true,
+    length: 512,
+    mysql: {
+      columnName: 'username',
+      dataType: 'varchar',
+      dataLength: 512,
+      dataPrecision: null,
+      dataScale: null,
+      nullable: 'N',
+    },
+  })
+  username: string;
 
   // Define well-known properties here
 
@@ -88,13 +98,13 @@ export class Users extends Entity {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any
 
-  constructor(data?: Partial<Users>) {
+  constructor(data?: Partial<User>) {
     super(data)
   }
 }
 
-export interface UsersRelations {
+export interface UserRelations {
   // describe navigational properties here
 }
 
-export type UsersWithRelations = Users & UsersRelations
+export type UserWithRelations = User & UserRelations

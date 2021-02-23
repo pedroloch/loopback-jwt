@@ -2,25 +2,24 @@ import { UserService } from '@loopback/authentication'
 import { repository } from '@loopback/repository'
 import { HttpErrors } from '@loopback/rest'
 import { securityId, UserProfile } from '@loopback/security'
-import IsEmail from 'isemail'
-import { Users } from '../models'
-import { UsersRepository } from '../repositories'
+import { User } from '../models'
+import { UserRepository } from '../repositories'
 import { comparePassword } from './hash.password'
 import { Credentials } from './validator'
 
-export class MyUserService implements UserService<Users, Credentials> {
+export class MyUserService implements UserService<User, Credentials> {
   constructor(
-    @repository(UsersRepository)
-    public usersRepository: UsersRepository
+    @repository(UserRepository)
+    public userRepository: UserRepository
   ) {}
-  async verifyCredentials(credentials: Credentials): Promise<Users> {
-    if (!IsEmail.validate(credentials.email)) {
-      throw new HttpErrors.UnprocessableEntity('Invalid Email')
-    }
+  async verifyCredentials(credentials: Credentials): Promise<User> {
+    // if (!IsEmail.validate(credentials.username)) {
+    //   throw new HttpErrors.UnprocessableEntity('Invalid Email')
+    // }
 
-    const foundUser = await this.usersRepository.findOne({
+    const foundUser = await this.userRepository.findOne({
       where: {
-        email: credentials.email,
+        username: credentials.username,
       },
     })
     if (!foundUser) throw new HttpErrors.BadRequest('Email not found')
@@ -35,7 +34,7 @@ export class MyUserService implements UserService<Users, Credentials> {
 
     return foundUser
   }
-  convertToUserProfile(user: Users): UserProfile {
+  convertToUserProfile(user: User): UserProfile {
     return {
       [securityId]: `${user.id}`,
       email: user.email,

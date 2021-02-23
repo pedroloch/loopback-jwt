@@ -1,19 +1,20 @@
 // Uncomment these imports to begin using these cool features!
 
 import { authenticate, AuthenticationBindings } from '@loopback/authentication'
+import { UserRepository } from '@loopback/authentication-jwt'
 import { inject } from '@loopback/core'
 import { repository } from '@loopback/repository'
 import {
   get,
   getJsonSchemaRef,
+  getModelSchemaRef,
   HttpErrors,
   post,
   requestBody,
 } from '@loopback/rest'
 import { SecurityBindings, UserProfile } from '@loopback/security'
 import _ from 'lodash'
-import { Users } from '../models'
-import { UsersRepository } from '../repositories'
+import { User } from '../models'
 import { hashPassword } from '../services/hash.password'
 import { JWTService } from '../services/jwt.service'
 import { MyUserService } from '../services/user.service'
@@ -22,8 +23,8 @@ import { CredentialsRequestBody } from './specs/auth.specs'
 
 export class AuthController {
   constructor(
-    @repository(UsersRepository)
-    public usersRepository: UsersRepository,
+    @repository(UserRepository)
+    public userRepository: UserRepository,
     @inject('services.user.service')
     public userService: MyUserService,
     @inject(SecurityBindings.USER, { optional: true })
@@ -37,24 +38,25 @@ export class AuthController {
       '200': {
         description: 'Sign Up user',
         content: {
-          schema: getJsonSchemaRef(Users),
+          schema: getJsonSchemaRef(User),
         },
       },
     },
   })
-  async signUp(@requestBody() userData: Users) {
-    validateCredentials(userData)
+  async signUp(@requestBody() userRequest: Omit<User, 'id'>) {
+    validateCredentials(_.pick(userRequest, ['username', 'password']))
 
-    const isUsed = await this.usersRepository.findOne({
-      where: { email: userData.email },
+    const isUsed = await this.userRepository.findOne({
+      where: { username: userRequest.username },
     })
 
-    if (isUsed) throw new HttpErrors.BadRequest('Email already taken')
+    if (isUsed) throw new HttpErrors.BadRequest('Username already taken')
 
-    userData.password = await hashPassword(userData.password)
+    userRequest.password = await hashPassword(userRequest.password)
 
-    const savedUser = await this.usersRepository.create(userData)
-    return _.pick(savedUser, ['email', 'name', 'id'])
+    const savedUser = await this.userRepository.create(userRequest)
+
+    return _.pick(savedUser, ['username', 'email', 'name', 'id'])
   }
 
   @post('/login', {
@@ -88,14 +90,27 @@ export class AuthController {
     return { user: userProfile, token }
   }
 
-  @get('/me')
+  @get('/me', {
+    responses: {
+      '200': {
+        description: 'User information',
+        content: {
+          'application/json': {
+            schema: getModelSchemaRef(User, {
+              exclude: ['password'],
+            }),
+          },
+        },
+      },
+    },
+  })
   @authenticate({ strategy: 'jwt' })
   async me(
     @inject(AuthenticationBindings.CURRENT_USER)
     userId: UserProfile
-  ): Promise<Omit<Users, 'password'>> {
-    const user = await this.usersRepository.findById(userId.id)
+  ): Promise<Omit<User, 'password'>> {
+    const user = await this.userRepository.findById(userId.id)
 
-    return _.pick(user, ['email', 'role', 'id', 'name'])
+    return _.pick(user, ['id', 'role', 'email', 'name', 'username'])
   }
 }

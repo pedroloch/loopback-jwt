@@ -13,7 +13,7 @@ import {
   ValueOrPromise,
 } from '@loopback/core'
 import { HttpErrors } from '@loopback/rest'
-import { Users } from '../models'
+import { User } from '../models'
 
 /**
  * This class will be bound to the application as an `Interceptor` during
@@ -25,7 +25,7 @@ export class AuthorizerInterceptor implements Provider<Interceptor> {
     @inject(AuthenticationBindings.METADATA)
     public metadata: AuthenticationMetadata[],
     @inject.getter(AuthenticationBindings.CURRENT_USER)
-    public getUser: Getter<Users>
+    public getUser: Getter<User>
   ) {}
 
   /**

@@ -37,11 +37,11 @@ export class BackendApplication extends BootMixin(
     // this.static('/', path.join(__dirname, '../client'))
 
     // Set Api page
-    this.static('/api', path.join(__dirname, '../public'))
+    this.static('/', path.join(__dirname, '../public'))
 
     // Customize @loopback/rest-explorer configuration here
     this.configure(RestExplorerBindings.COMPONENT).to({
-      path: '/api/explorer',
+      path: '/explorer',
     })
 
     this.component(RestExplorerComponent)
@@ -70,7 +70,7 @@ export class BackendApplication extends BootMixin(
   setupBindings(): void {
     this.bind('services.user.service').toClass(MyUserService)
     this.bind('service.jwt.service').toClass(JWTService)
-    this.bind('authentication.jwt.secret').to('3r23r23')
+    this.bind('authentication.jwt.secret').to('908248csdcas98')
     this.bind('authentication.jwt.expiresIn').to(1000 * 60 * 60 * 7)
     this.bind(RestBindings.ERROR_WRITER_OPTIONS).to({
       debug: process.env.NODE_ENV !== 'production',

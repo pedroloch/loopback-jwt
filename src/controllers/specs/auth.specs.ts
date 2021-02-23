@@ -8,7 +8,7 @@ class UserCredentials {
     id: false,
     required: true,
   })
-  email: string
+  username: string
   @property({
     type: 'string',
     id: false,
@@ -20,6 +20,7 @@ class UserCredentials {
   })
   password: string
 }
+
 export const CredentialsSchema = getModelSchemaRef(UserCredentials)
 
 export const CredentialsRequestBody = {
